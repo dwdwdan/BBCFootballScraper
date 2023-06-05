@@ -8,17 +8,17 @@ from tabulate import tabulate
 from bs4 import BeautifulSoup
 
 league = "premier-league"
-URL = "https://www.bbc.co.uk/sport/football/" + league
+BASE_URL = "https://www.bbc.co.uk/sport/football/"
 
 standings = pd.read_csv(league+"-table.csv")
 results = pd.read_csv(league+"-matches.csv")
 
-def update_table(URL):
+def update_table(league):
     """Update the standings in the csv. Also returns the standings as a pandas dataframe.
 
-    Inputs: URL - The URL to query
+    Inputs: league - The league to query
     """
-    URL = URL + "/table"
+    URL = BASE_URL + league + "/table"
     page = requests.get(URL)
     soup = BeautifulSoup(page.content, "html.parser")
 
@@ -46,9 +46,9 @@ def update_table(URL):
     return table
 
 
-def __get_results_single_month(URL, year, month):
+def __get_results_single_month(league, year, month):
     date = str(year) + "-" + f"{month:02}"
-    URL = URL + "/scores-fixtures/" + date
+    URL = BASE_URL + league + "/scores-fixtures/" + date
     page = requests.get(URL)
     soup = BeautifulSoup(page.content, "html.parser")
 
@@ -74,19 +74,19 @@ def __get_results_single_month(URL, year, month):
 
     return table
 
-def __get_results_single_year(URL, year, months):
+def __get_results_single_year(league, year, months):
     col_headers = ["Date", "Home Team", "Home Score", "Away Score", "Away Team"]
     table = pd.DataFrame(columns=col_headers)
     for month in months:
-        month_table = __get_results_single_month(URL, year, month)
+        month_table = __get_results_single_month(league, year, month)
         table = pd.concat([table, month_table])
 
     return table
 
-def update_results(URL, start_year, start_month, end_year, end_month):
+def update_results(league, start_year, start_month, end_year, end_month):
     """Update the results in the csv. Also returns the results as pandas dataframe.
 
-    Inputs: URL - the URL to scrape
+    Inputs: league - the league to scrape
             start_year - The year of the first month
             start_month - The first month to consider. An integer between 1 and 12
             end_year - The year of the last month
@@ -95,22 +95,22 @@ def update_results(URL, start_year, start_month, end_year, end_month):
     if end_year == start_year:
         print("Start Year is the same as end year")
         months = range(start_month, end_month)
-        table = __get_results_single_year(URL, start_year, months)
+        table = __get_results_single_year(league, start_year, months)
         return table
 
     print("First Year Data")
-    table = __get_results_single_year(URL, start_year, range(start_month,12))
+    table = __get_results_single_year(league, start_year, range(start_month,12))
     print("Table has " + str(len(table)) + " entries")
 
     if end_year > start_year + 2:
         for year in range(start_year + 1, end_year - 1):
             print("Data for " + str(year))
-            year_table = __get_results_single_year(URL, year, range(1,12))
+            year_table = __get_results_single_year(league, year, range(1,12))
             table = pd.concat([table, year_table])
             print("Table has " + str(len(table)) + " entries")
 
     print("Last Year Data")
-    last_year_table = __get_results_single_year(URL, end_year, range(1, end_month))
+    last_year_table = __get_results_single_year(league, end_year, range(1, end_month))
     table = pd.concat([table, last_year_table])
     print("Table has " + str(len(table)) + " entries")
 
