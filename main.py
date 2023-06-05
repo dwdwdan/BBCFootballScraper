@@ -34,7 +34,6 @@ def get_table(URL):
     return table
 
 
-get_table(URL)
 def __get_results_single_month(URL, year, month):
     date = str(year) + "-" + f"{month:02}"
     URL = URL + "/scores-fixtures/" + date
