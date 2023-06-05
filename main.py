@@ -7,9 +7,10 @@ from bs4 import BeautifulSoup
 league = "premier-league"
 URL = "https://www.bbc.co.uk/sport/football/" + league
 
-def get_table(URL):
 standings = pd.read_csv(league+"-table.csv")
 results = pd.read_csv(league+"-matches.csv")
+
+def update_table(URL):
     URL = URL + "/table"
     page = requests.get(URL)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -75,7 +76,7 @@ def __get_results_single_year(URL, year, months):
 
     return table
 
-def get_results(URL, start_year, start_month, end_year, end_month):
+def update_results(URL, start_year, start_month, end_year, end_month):
     if end_year == start_year:
         print("Start Year is the same as end year")
         months = range(start_month, end_month)
