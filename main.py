@@ -58,3 +58,5 @@ def __get_results_single_month(URL, year, month):
             table.loc[len(table)] = new_row
 
     return table
+def print_table(table):
+    print(tabulate(table, headers='keys', showindex=False))
