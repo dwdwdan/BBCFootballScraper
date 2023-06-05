@@ -110,7 +110,7 @@ def update_results(league, start_year, start_month, end_year, end_month):
     table.sort_values(by="Date", inplace=True)
 
 
-    table.to_csv(league+"-matches.csv", index=False)
+    table.to_csv(league+"-results.csv", index=False)
     return table
 
 
