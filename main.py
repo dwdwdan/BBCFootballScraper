@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import dateparser
 from tabulate import tabulate
 from bs4 import BeautifulSoup
 
@@ -45,7 +46,9 @@ def __get_results_single_month(URL, year, month):
 
     match_days = soup.findAll('div', 'qa-match-block')
     for match_day in match_days:
-        date = match_day.find('h3').get_text()
+        date_raw = match_day.find('h3').get_text()
+        date= dateparser.parse(date_raw).replace(year = year).date()
+
         matches = match_day.findAll('li')
         for match in matches:
             home_team = match.find('span', 'sp-c-fixture__team--home')
@@ -59,7 +62,8 @@ def __get_results_single_month(URL, year, month):
             table.loc[len(table)] = new_row
 
     return table
-def get_results(URL, year, months):
+
+def __get_results_single_year(URL, year, months):
     col_headers = ["Date", "Home Team", "Home Score", "Away Score", "Away Team"]
     table = pd.DataFrame(columns=col_headers)
     for month in months:
@@ -67,5 +71,36 @@ def get_results(URL, year, months):
         table = pd.concat([table, month_table])
 
     return table
+
+def get_results(URL, start_year, start_month, end_year, end_month):
+    if end_year == start_year:
+        print("Start Year is the same as end year")
+        months = range(start_month, end_month)
+        table = __get_results_single_year(URL, start_year, months)
+        return table
+
+    print("First Year Data")
+    table = __get_results_single_year(URL, start_year, range(start_month,12))
+    print("Table has " + str(len(table)) + " entries")
+
+    if end_year > start_year + 2:
+        for year in range(start_year + 1, end_year - 1):
+            print("Data for " + str(year))
+            year_table = __get_results_single_year(URL, year, range(1,12))
+            table = pd.concat([table, year_table])
+            print("Table has " + str(len(table)) + " entries")
+
+    print("Last Year Data")
+    last_year_table = __get_results_single_year(URL, end_year, range(1, end_month))
+    table = pd.concat([table, last_year_table])
+    print("Table has " + str(len(table)) + " entries")
+
+    print("Sorting Data")
+    table.sort_values(by="Date", inplace=True)
+    print("Table has " + str(len(table)) + " entries")
+
+    return table
+
+
 def print_table(table):
     print(tabulate(table, headers='keys', showindex=False))
