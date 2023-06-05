@@ -8,6 +8,8 @@ league = "premier-league"
 URL = "https://www.bbc.co.uk/sport/football/" + league
 
 def get_table(URL):
+standings = pd.read_csv(league+"-table.csv")
+results = pd.read_csv(league+"-matches.csv")
     URL = URL + "/table"
     page = requests.get(URL)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -30,6 +32,8 @@ def get_table(URL):
 
 
         table.loc[len(table)] = row_list
+
+    table.to_csv(league+"-table.csv", index=False)
 
     return table
 
@@ -98,6 +102,8 @@ def get_results(URL, start_year, start_month, end_year, end_month):
     table.sort_values(by="Date", inplace=True)
     print("Table has " + str(len(table)) + " entries")
 
+
+    table.to_csv(league+"-matches.csv", index=False)
     return table
 
 
