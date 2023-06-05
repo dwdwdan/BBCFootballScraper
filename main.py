@@ -93,30 +93,21 @@ def update_results(league, start_year, start_month, end_year, end_month):
             end_month - The last month to consider. An integer between 1 and 12
     """
     if end_year == start_year:
-        print("Start Year is the same as end year")
         months = range(start_month, end_month)
         table = __get_results_single_year(league, start_year, months)
         return table
 
-    print("First Year Data")
     table = __get_results_single_year(league, start_year, range(start_month,12))
-    print("Table has " + str(len(table)) + " entries")
 
     if end_year > start_year + 2:
         for year in range(start_year + 1, end_year - 1):
-            print("Data for " + str(year))
             year_table = __get_results_single_year(league, year, range(1,12))
             table = pd.concat([table, year_table])
-            print("Table has " + str(len(table)) + " entries")
 
-    print("Last Year Data")
     last_year_table = __get_results_single_year(league, end_year, range(1, end_month))
     table = pd.concat([table, last_year_table])
-    print("Table has " + str(len(table)) + " entries")
 
-    print("Sorting Data")
     table.sort_values(by="Date", inplace=True)
-    print("Table has " + str(len(table)) + " entries")
 
 
     table.to_csv(league+"-matches.csv", index=False)
