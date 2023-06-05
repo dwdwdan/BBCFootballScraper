@@ -33,3 +33,28 @@ def get_table(URL):
     print(tabulate(table, headers=col_headers, showindex=False))
 
 get_table(URL)
+def __get_results_single_month(URL, year, month):
+    date = str(year) + "-" + f"{month:02}"
+    URL = URL + "/scores-fixtures/" + date
+    page = requests.get(URL)
+    soup = BeautifulSoup(page.content, "html.parser")
+
+    col_headers = ["Date", "Home Team", "Home Score", "Away Score", "Away Team"]
+    table = pd.DataFrame(columns=col_headers)
+
+    match_days = soup.findAll('div', 'qa-match-block')
+    for match_day in match_days:
+        date = match_day.find('h3').get_text()
+        matches = match_day.findAll('li')
+        for match in matches:
+            home_team = match.find('span', 'sp-c-fixture__team--home')
+            home_team_name = home_team.find('span', 'qa-full-team-name').get_text()
+            home_team_score = home_team.find('span', 'sp-c-fixture__number').get_text()
+
+            away_team = match.find('span', 'sp-c-fixture__team--away')
+            away_team_name = away_team.find('span', 'qa-full-team-name').get_text()
+            away_team_score = away_team.find('span', 'sp-c-fixture__number').get_text()
+            new_row = [date, home_team_name, home_team_score, away_team_score, away_team_name]
+            table.loc[len(table)] = new_row
+
+    return table
