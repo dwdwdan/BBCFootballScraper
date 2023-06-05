@@ -58,5 +58,13 @@ def __get_results_single_month(URL, year, month):
             table.loc[len(table)] = new_row
 
     return table
+def get_results(URL, year, months):
+    col_headers = ["Date", "Home Team", "Home Score", "Away Score", "Away Team"]
+    table = pd.DataFrame(columns=col_headers)
+    for month in months:
+        month_table = __get_results_single_month(URL, year, month)
+        table = pd.concat([table, month_table])
+
+    return table
 def print_table(table):
     print(tabulate(table, headers='keys', showindex=False))
