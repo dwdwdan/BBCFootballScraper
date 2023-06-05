@@ -4,14 +4,36 @@
 import requests
 import pandas as pd
 import dateparser
+from os.path import isfile
 from tabulate import tabulate
 from bs4 import BeautifulSoup
 
 league = "premier-league"
 BASE_URL = "https://www.bbc.co.uk/sport/football/"
 
-standings = pd.read_csv(league+"-table.csv")
-results = pd.read_csv(league+"-matches.csv")
+
+def load_csvs(league):
+    """Load csvs previously generated.
+
+    Inputs: league - the league the csv's correspond to
+
+    Outputs: Standings - A pandas dataframe with the standings for the league stored in the csv
+             Results - A pandas dataframe with the results from the csv"""
+
+
+    if isfile(league+"-table.csv"):
+        standings = pd.read_csv(league+"-table.csv")
+    else:
+        print("No Standings File Found for " + league)
+        standings = None
+    if isfile(league+"-results.csv"):
+        results = pd.read_csv(league+"-results.csv")
+    else:
+        print("No Results File Found for " + league)
+        results = None
+
+    return standings, results
+
 
 def update_table(league):
     """Update the standings in the csv. Also returns the standings as a pandas dataframe.
