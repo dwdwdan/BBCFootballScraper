@@ -1,3 +1,6 @@
+"""A module to scrape the bbc football website and extract standings and results"""
+
+
 import requests
 import pandas as pd
 import dateparser
@@ -11,6 +14,10 @@ standings = pd.read_csv(league+"-table.csv")
 results = pd.read_csv(league+"-matches.csv")
 
 def update_table(URL):
+    """Update the standings in the csv. Also returns the standings as a pandas dataframe.
+
+    Inputs: URL - The URL to query
+    """
     URL = URL + "/table"
     page = requests.get(URL)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -77,6 +84,14 @@ def __get_results_single_year(URL, year, months):
     return table
 
 def update_results(URL, start_year, start_month, end_year, end_month):
+    """Update the results in the csv. Also returns the results as pandas dataframe.
+
+    Inputs: URL - the URL to scrape
+            start_year - The year of the first month
+            start_month - The first month to consider. An integer between 1 and 12
+            end_year - The year of the last month
+            end_month - The last month to consider. An integer between 1 and 12
+    """
     if end_year == start_year:
         print("Start Year is the same as end year")
         months = range(start_month, end_month)
@@ -109,4 +124,7 @@ def update_results(URL, start_year, start_month, end_year, end_month):
 
 
 def print_table(table):
+    """Pretty print a table"""
     print(tabulate(table, headers='keys', showindex=False))
+
+
